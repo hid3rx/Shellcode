@@ -90,7 +90,6 @@ VOID Shellcode() {
     typedef HMODULE(WINAPI* pfnLoadLibraryA)(_In_ LPCSTR lpLibFileName);
     typedef FARPROC(WINAPI* pfnGetProcAddress)(_In_ HMODULE hModule, _In_ LPCSTR lpProcName);
     typedef VOID(WINAPI* pfnExitThread)(_In_ DWORD dwExitCode);
-    typedef VOID(WINAPI* pfnExitProcess)(_In_ UINT uExitCode);
 
     typedef SC_HANDLE(WINAPI* pfnOpenSCManagerA)(_In_opt_ LPCSTR lpMachineName, _In_opt_ LPCSTR lpDatabaseName, _In_ DWORD dwDesiredAccess);
     typedef SC_HANDLE(WINAPI* pfnCreateServiceA)(
