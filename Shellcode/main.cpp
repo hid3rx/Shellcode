@@ -43,16 +43,13 @@ __forceinline HMODULE GetKernel32Base() {
     do {
         PLDR_DATA_TABLE_ENTRY Ldr = CONTAINING_RECORD(CurrEntry->Flink, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks);
 
-        if (*((DWORD*)&(Ldr->FullDllName.Buffer[20])) == 0x45004b &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[22])) == 0x4e0052 &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[24])) == 0x4c0045 &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[26])) == 0x320033)
-            return (HMODULE)Ldr->DllBase;
-
-        else if (*((DWORD*)&(Ldr->FullDllName.Buffer[20])) == 0x65006b &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[22])) == 0x6e0072 &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[24])) == 0x6c0065 &&
-            *((DWORD*)&(Ldr->FullDllName.Buffer[26])) == 0x320033)
+        if ((Ldr->FullDllName.Buffer[20] == L'k' || Ldr->FullDllName.Buffer[20] == L'K') &&
+            (Ldr->FullDllName.Buffer[21] == L'e' || Ldr->FullDllName.Buffer[21] == L'E') &&
+            (Ldr->FullDllName.Buffer[22] == L'r' || Ldr->FullDllName.Buffer[22] == L'R') &&
+            (Ldr->FullDllName.Buffer[23] == L'n' || Ldr->FullDllName.Buffer[23] == L'N') &&
+            (Ldr->FullDllName.Buffer[24] == L'e' || Ldr->FullDllName.Buffer[24] == L'E') &&
+            (Ldr->FullDllName.Buffer[25] == L'l' || Ldr->FullDllName.Buffer[25] == L'L') &&
+            (Ldr->FullDllName.Buffer[26] == L'3') && (Ldr->FullDllName.Buffer[27] == L'2'))
             return (HMODULE)Ldr->DllBase;
 
         CurrEntry = CurrEntry->Flink;
