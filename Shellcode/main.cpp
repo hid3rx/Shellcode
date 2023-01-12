@@ -2,6 +2,15 @@
 #include <winternl.h>
 
 /*
+* Shellcode生成注意事项：
+* 
+* 1. 生成的OBJ文件后应检查是否存在MOVAPS指令，这种指令通常伴随SSE指令出现，在内存不对齐的情况下执行MOVAPS一定会出现异常
+* 2. 生成的OBJ文件后应检查入口函数开头是否有 MOV [RSP+8], RBX 这种指令，这种指令会帧栈内的数据进行操作，可能会导致Shellcode的头几个字节被修改
+* 
+*/
+
+
+/*
 * 函数哈希
 */
 
@@ -32,11 +41,6 @@ __forceinline HMODULE GetKernel32Base() {
         PLDR_DATA_TABLE_ENTRY Ldr = CONTAINING_RECORD(CurrEntry->Flink, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks);
 
         if ((Ldr->FullDllName.Buffer[20] == L'k' || Ldr->FullDllName.Buffer[20] == L'K') &&
-            (Ldr->FullDllName.Buffer[21] == L'e' || Ldr->FullDllName.Buffer[21] == L'E') &&
-            (Ldr->FullDllName.Buffer[22] == L'r' || Ldr->FullDllName.Buffer[22] == L'R') &&
-            (Ldr->FullDllName.Buffer[23] == L'n' || Ldr->FullDllName.Buffer[23] == L'N') &&
-            (Ldr->FullDllName.Buffer[24] == L'e' || Ldr->FullDllName.Buffer[24] == L'E') &&
-            (Ldr->FullDllName.Buffer[25] == L'l' || Ldr->FullDllName.Buffer[25] == L'L') &&
             (Ldr->FullDllName.Buffer[26] == L'3') && (Ldr->FullDllName.Buffer[27] == L'2'))
             return (HMODULE)Ldr->DllBase;
 
