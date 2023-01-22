@@ -84,14 +84,13 @@ int _tmain(int argc, TCHAR* argv[]) {
 		return 0;
 	}
 
-	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)Buffer, NULL, 0, NULL);
+	DWORD ThreadId;
+	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)Buffer, NULL, 0, &ThreadId);
 	if (hThread == NULL) {
 		_tprintf(_T("[x] CreateRemoteThread failed, error: 0x%x\n"), GetLastError());
 		CloseHandle(hProcess);
 		return 0;
 	}
-
-	DWORD ThreadId = GetThreadId(hThread);
 
 	_tprintf(_T("[+] Success, ThreadId = 0x%x (%d)\n"), ThreadId, ThreadId);
 
