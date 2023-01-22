@@ -91,7 +91,9 @@ int _tmain(int argc, TCHAR* argv[]) {
 		return 0;
 	}
 
-	_tprintf(_T("[+] Success\n"));
+	DWORD ThreadId = GetThreadId(hThread);
+
+	_tprintf(_T("[+] Success, ThreadId = 0x%x (%d)\n"), ThreadId, ThreadId);
 
 	CloseHandle(hProcess);
 	CloseHandle(hThread);
