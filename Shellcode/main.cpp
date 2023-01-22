@@ -25,7 +25,7 @@ PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash);
 */
 
 #define HASH_LoadLibraryA 0x071d2c76
-#define HASH_GetProcAddress 0xc2cbc15a
+#define HASH_MessageBoxA 0x4ce54ccf
 
 /*
 * Shellcode 实现
@@ -36,7 +36,6 @@ VOID Shellcode()
 {
     // Kernel32.dll
     typedef HMODULE(WINAPI* pfnLoadLibraryA)(_In_ LPCSTR lpLibFileName);
-    typedef FARPROC(WINAPI* pfnGetProcAddress)(_In_ HMODULE hModule, _In_ LPCSTR lpProcName);
 
     // User32.dll
     typedef int (WINAPI* pfnMessageBoxA)(
@@ -50,13 +49,12 @@ VOID Shellcode()
 
     // 获取 Kernel32.dll 函数
     pfnLoadLibraryA LoadLibraryA = (pfnLoadLibraryA)GetProcAddrByHash(Kernel32, HASH_LoadLibraryA);
-    pfnGetProcAddress GetProcAddress = (pfnGetProcAddress)GetProcAddrByHash(Kernel32, HASH_GetProcAddress);
 
     // 载入 User32.dll 模块
     HMODULE User32 = LoadLibraryA("User32.dll");
 
     // 获取 User32.dll 函数
-    pfnMessageBoxA MessageBoxA = (pfnMessageBoxA)GetProcAddress(User32, "MessageBoxA");
+    pfnMessageBoxA MessageBoxA = (pfnMessageBoxA)GetProcAddrByHash(User32, HASH_MessageBoxA);
 
     // 弹框
     MessageBoxA(NULL, "Hello", "Message", MB_OK);
