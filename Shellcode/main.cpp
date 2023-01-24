@@ -1,11 +1,23 @@
 #include <Windows.h>
 #include <winternl.h>
+#include <stdio.h>
+
+#pragma section(".shc",read,execute)
+#pragma comment(linker, "/section:.shc,RWE")
+
+#pragma data_seg(".dat")
+#pragma comment(linker, "/merge:.dat=.shc")
+
+#pragma const_seg(".rdat")
+#pragma comment(linker, "/merge:.rdat=.shc")
+
 
 /*
 * Shellcode生成注意事项：
 *
 * 1. 生成的OBJ文件后应检查是否存在MOVAPS、MOVDQA等内存对齐的指令，这种指令通常伴随SSE指令出现，在内存不对齐的情况下执行此类指令一定会出现异常
 * 2. 生成的OBJ文件后应检查入口函数开头是否有 MOV [RSP+8], RBX 这种指令，这种指令会帧栈内的数据进行操作，可能会导致Shellcode的头几个字节被修改
+* 3. 生成的Shellcode开头一般会是字符串数据，可以在Shellcode开头添加 JMP $+0x30 指令实现直接跳转
 *
 */
 
@@ -31,8 +43,7 @@ PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash);
 * Shellcode 实现
 */
 
-#pragma code_seg(push, ".text$00")
-VOID Shellcode()
+__declspec(code_seg(".shc")) __declspec(noalias) VOID Shellcode()
 {
     // Kernel32.dll
     typedef HMODULE(WINAPI* pfnLoadLibraryA)(_In_ LPCSTR lpLibFileName);
@@ -59,10 +70,8 @@ VOID Shellcode()
     // 弹框
     MessageBoxA(NULL, "Hello", "Message", MB_OK);
 }
-#pragma code_seg(pop)
 
-#pragma code_seg(push, ".text$01")
-PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash)
+__declspec(code_seg(".shc")) __declspec(noalias) PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash)
 {
     PIMAGE_DOS_HEADER DosHeader = (PIMAGE_DOS_HEADER)Module;
     PIMAGE_NT_HEADERS NtHeaders = (PIMAGE_NT_HEADERS)((UINT_PTR)Module + DosHeader->e_lfanew);
@@ -86,7 +95,6 @@ PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash)
 
     return NULL;
 }
-#pragma code_seg(pop)
 
 /*
 * 内联函数
@@ -129,4 +137,13 @@ __forceinline DWORD HashKey(CHAR* key)
         Hash = (Hash << 5) + Hash + *key++;
     }
     return Hash;
+}
+
+/*
+* 导出Shellcode
+*/
+
+int main() {
+    Shellcode();
+    return 0;
 }
