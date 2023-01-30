@@ -26,9 +26,9 @@
 * º¯ÊýÉùÃ÷
 */
 
-__forceinline PPEB GetCurrentPeb();
-__forceinline HMODULE GetKernel32Base();
-__forceinline DWORD HashKey(CHAR* key);
+PPEB GetCurrentPeb();
+HMODULE GetKernel32Base();
+DWORD HashKey(CHAR* key);
 VOID Shellcode();
 PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash);
 
