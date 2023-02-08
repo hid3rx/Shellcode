@@ -2,7 +2,7 @@
 #include <winternl.h>
 #include <stdio.h>
 
-#pragma section(".shc",read,execute)
+#pragma section(".shc", read, execute)
 #pragma comment(linker, "/section:.shc,RWE")
 
 #pragma data_seg(".dat")
@@ -26,7 +26,6 @@
 * 函数声明
 */
 
-PPEB GetCurrentPeb();
 HMODULE GetKernel32Base();
 DWORD HashKey(CHAR* key);
 VOID Shellcode();
@@ -100,19 +99,15 @@ __declspec(code_seg(".shc")) __declspec(noalias) PVOID GetProcAddrByHash(HMODULE
 * 内联函数
 */
 
-__forceinline PPEB GetCurrentPeb()
+__forceinline HMODULE GetKernel32Base()
 {
 #ifdef _WIN64 // x64
     PTEB Teb = (PTEB)__readgsqword(offsetof(NT_TIB, Self));
 #else // x86
     PTEB Teb = (PTEB)__readfsdword(offsetof(NT_TIB, Self));
 #endif
-    return Teb->ProcessEnvironmentBlock;
-}
 
-__forceinline HMODULE GetKernel32Base()
-{
-    PPEB Peb = GetCurrentPeb();
+    PPEB Peb = Teb->ProcessEnvironmentBlock;
     PLIST_ENTRY ListHead = Peb->Ldr->InMemoryOrderModuleList.Flink;
     PLIST_ENTRY CurrEntry = ListHead;
 
