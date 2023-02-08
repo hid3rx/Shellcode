@@ -2,22 +2,24 @@
 
 本仓库是一个 Shellcode 生成模板，仓库内共有四个模块：Shellcode、Hash、Loader、Injector。
 
+**Shellcode:** 编写Shellcode的主模块；
+
 **Hash:** 计算指定API名称的Hash值，方便从DLL中获取函数地址；
 
-**Loader:** 将Shellcode直接编译到.text段，可直接执行而无需重新分配内存，该项目的主要作用是测试Shellcode能否正常独立运行；
+**Loader:** 该模块主要用于测试Shellcode能否正常独立运行；
 
-**Injector:** 利用VirtualAllocEx在其他进程内注入Shellcode，该项目的主要作用是测试Shellcode能否在其他进程中正常运行。
+**Injector:** 该模块主要用于测试Shellcode注入其他进程后能否正常独立运行。
 
 # 原理
 
-**基本步骤**
+## 基本步骤
 
 1. 利用 `__readgsqword/__readfsdword` 函数获取当前进程的PEB结构体；
 2. 从PEB的模块链表中中寻找Kernel32.dll的基址；
 3. 通过对比函数名Hash的方式，从Kernel32.dll中提取所需的函数；
 4. 调用提取到的函数，实现所需功能。
 
-**注意事项**
+## 注意事项
 
 1. Shellcode是一段位置无关的代码，因此在调用Windows API时务必通过上述步骤获取函数地址再调用，以免出现地址冲突的异常；
 2. 在声明一个字符串数组时，编译器有可能会自动帮助我们将数组字符全部置0，而所使用的函数正是`memset`，这种情况会导致提取的Shellcode无法运行，此时有两种方案，编译器禁用优化，或者避免声明字符串数组；
@@ -25,7 +27,7 @@
 
 ![image-20230208154927584](assets/image-20230208154927584.png)
 
-**内存分布**
+## 内存分布
 
 为了方便提取Shellcode，这里设置了几个编译选项：
 
@@ -45,7 +47,7 @@ __declspec(code_seg(".shc")) VOID Shellcode();
 
 这些选项表示：新建一个 `.shc` 代码段，并把 `GetProcAddrByHash` 和 `Shellcode` 函数都编译这个段中，然后把数据段和常量数据段与 `.shc` 段合并，从而实现代码和数据编译到同一个段，但是由于编译器默认把数据放置在代码前面，并且没有提供调整顺序的选项，我没办法对其进行调整。
 
-**Shellcode编写流程**
+## Shellcode编写流程
 
 以弹出一个消息框的Shellcode为例，这里做出一点关于编写Shellcode的流程解释：
 
@@ -116,7 +118,7 @@ VOID Shellcode()
 }
 ```
 
-**Shellcode提取**
+## Shellcode提取
 
 编译上述代码后，将 `Shellcode.exe` 通过IDA打开，定位至 `.shc` 代码段：
 
@@ -128,7 +130,7 @@ VOID Shellcode()
 
 根据计算，Shellcode代码部分位于 `0x20` 的位置（绿色部分字节码），因此Shellcode的入口点就是 `0x20`。
 
-**Shellcode测试**
+## Shellcode测试
 
 以 Injector 模块为例，将上述提取到的代码填入 Shellcode 数组，将入口点设置为 0x20，然后编译，运行结果如下：
 
