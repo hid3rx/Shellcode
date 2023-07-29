@@ -1,8 +1,8 @@
 #include <Windows.h>
 #include <stdio.h>
 
-DWORD HashKey(char* key) {
-
+DWORD HashKey(char* key)
+{
     DWORD nHash = 0;
     while (*key) {
         nHash = (nHash << 5) + nHash + *key++;
@@ -10,8 +10,8 @@ DWORD HashKey(char* key) {
     return nHash;
 }
 
-int main(int argc, char* argv[]) {
-
+int main(int argc, char* argv[])
+{
     if (argc != 2) {
         printf("Usage: %s <API Name>\n", argv[0]);
     }

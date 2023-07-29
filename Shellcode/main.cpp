@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include <winternl.h>
+#include <Winternl.h>
 #include <stdio.h>
 
 #pragma section(".shc", read, execute)
@@ -16,10 +16,25 @@
 * Shellcode生成注意事项：
 *
 * 1. 生成的OBJ文件后应检查是否存在MOVAPS、MOVDQA等内存对齐的指令，这种指令通常伴随SSE指令出现，在内存不对齐的情况下执行此类指令一定会出现异常
-* 2. 生成的OBJ文件后应检查入口函数开头是否有 MOV [RSP+8], RBX 这种指令，这种指令会帧栈内的数据进行操作，可能会导致Shellcode的头几个字节被修改
+* 2. 生成的OBJ文件后应检查入口函数开头是否有 MOV [RSP+8], RBX 这种指令，这种指令会对帧栈内的数据进行操作，可能会导致Shellcode的头几个字节被修改
 * 3. 生成的Shellcode开头一般会是字符串数据，可以在Shellcode开头添加 JMP $+0x30 指令实现直接跳转
 *
 */
+
+
+/*
+* 函数签名声明
+*/
+
+// Kernel32.dll
+typedef HMODULE(WINAPI* pfnLoadLibraryA)(_In_ LPCSTR lpLibFileName);
+
+// User32.dll
+typedef int (WINAPI* pfnMessageBoxA)(
+    _In_opt_ HWND hWnd,
+    _In_opt_ LPCSTR lpText,
+    _In_opt_ LPCSTR lpCaption,
+    _In_ UINT uType);
 
 
 /*
@@ -31,6 +46,7 @@ DWORD HashKey(CHAR* key);
 VOID Shellcode();
 PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash);
 
+
 /*
 * 函数哈希
 */
@@ -38,22 +54,13 @@ PVOID GetProcAddrByHash(HMODULE Module, DWORD Hash);
 #define HASH_LoadLibraryA 0x071d2c76
 #define HASH_MessageBoxA 0x4ce54ccf
 
+
 /*
 * Shellcode 实现
 */
 
 __declspec(code_seg(".shc")) __declspec(noalias) VOID Shellcode()
 {
-    // Kernel32.dll
-    typedef HMODULE(WINAPI* pfnLoadLibraryA)(_In_ LPCSTR lpLibFileName);
-
-    // User32.dll
-    typedef int (WINAPI* pfnMessageBoxA)(
-        _In_opt_ HWND hWnd,
-        _In_opt_ LPCSTR lpText,
-        _In_opt_ LPCSTR lpCaption,
-        _In_ UINT uType);
-
     // 获取 Kernel32.dll 模块
     HMODULE Kernel32 = GetKernel32Base();
 

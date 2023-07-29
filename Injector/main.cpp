@@ -33,8 +33,8 @@ BYTE Shellcode[] = {
 
 BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 
-int _tmain(int argc, TCHAR* argv[]) {
-
+int _tmain(int argc, TCHAR* argv[])
+{
 	if (argc != 2) {
 		_tprintf(_T("[!] Usage: main.exe [pid]\n"));
 		return 0;
@@ -89,8 +89,8 @@ int _tmain(int argc, TCHAR* argv[]) {
 	return 0;
 }
 
-BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege) {
-
+BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege)
+{
 	LUID luid;
 	BOOL bRet = FALSE;
 
