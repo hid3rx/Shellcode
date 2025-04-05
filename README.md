@@ -28,8 +28,8 @@
 一、首先将需要调用的函数名转换为Hash（通过仓库中的Hash模块）
 
 ```c
-#define HASH_LoadLibraryA 0x071d2c76
-#define HASH_MessageBoxA 0x4ce54ccf
+#define HASH_LoadLibraryA	0x071d2c76
+#define HASH_MessageBoxA	0x4ce54ccf
 ```
 
 二、从MSDN或者头文件源码中把函数声明原型提取出来
