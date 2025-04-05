@@ -87,6 +87,7 @@ VOID Shellcode()
 使用 `gcc` 编译，将shellcode模块编译成 `.o` 文件：
 
 > 编译为 `.o` 文件的好处是编译出来的的代码只包含Shellcode部分，不会编译出其他无关代码
+
 > `-fno-asynchronous-unwind-tables` 参数的作用是避免生成一些与运行功能无关的代码
 
 ```
@@ -106,6 +107,6 @@ gcc -c main.c -O3 -fno-asynchronous-unwind-tables
 
 ## Shellcode测试
 
-以 injector 模块为例，将上述提取到的代码填入 Shellcode 数组，然后编译，运行结果如下：
+以 injector 模块为例，将上述提取到的代码填入 Shellcode 数组并编译，尝试注入计算器进程，结果如下：
 
 ![Snipaste_2025-04-06_02-00-21.png](assets/Snipaste_2025-04-06_02-00-21.png)
