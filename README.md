@@ -16,8 +16,8 @@
 
 1. 利用 `__readgsqword/__readfsdword` 函数，读取获取当前进程的GS/FS寄存器，并找到PEB结构体地址；
 2. 从PEB的模块链表中中寻找 `Kernel32.dll` 的基址；
-3. 通过对比API函数名Hash的方式，在 `Kernel32.dll` 中找到 `LoadLibraryA` / `GetProcAddress` 等函数的地址；
-4. 使用 `LoadLibraryA` / `GetProcAddress` 函数载入特定DLL及所需函数；
+3. 通过对比API函数名Hash的方式，在 `Kernel32.dll` 中找到 `LoadLibraryA` 等函数的地址；
+4. 使用 `LoadLibraryA` / `GetProcAddrByHash` 函数载入特定DLL及所需函数；
 5. 调用提取到的函数，实现所需功能。
 
 ## Shellcode编写流程
