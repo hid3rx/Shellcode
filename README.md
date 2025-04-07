@@ -116,7 +116,9 @@ pfnMessageBoxA MessageBoxA = (pfnMessageBoxA)GetProcAddrByHash(User32, HASH_Mess
 
 > 从代码中可以看到，需要用到字符串参数的时候，我们不能直接将字符串填充到函数参数里，因为这样字符串会被编译到距离Shellcode函数较远的位置，不方便后续Shellcode的提取
 
-> 我把 `VOID Shellcode()` 函数放置在 `.shc` 段中，把字符串放置在 `.str` 段中，这两个段会被 GCC 编译到相邻的位置，而且 `.shc` 段在 `.str` 上方，这样极大的方便了Shellcode的提取
+> 我把 `VOID Shellcode()` 函数放置在 `.shc` 段中，把字符串放置在 `.str` 段中，这两个段会被 GCC 编译到相邻的位置，而且 `.shc` 段在 `.str` 前方，这样极大的方便了Shellcode的提取，如下图所示：
+
+![Snipaste_2025-04-07_13-25-36.png](assets/Snipaste_2025-04-07_13-25-36.png)
 
 **七、调用 `MessageBoxA`**
 
