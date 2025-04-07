@@ -105,7 +105,7 @@ __attribute__((section(".shc"))) VOID Shellcode()
     // 获取 Kernel32.dll 模块
     HMODULE Kernel32 = GetKernel32Base();
 
-    // 获取 Kernel32.dll 函数
+    // 获取 LoadLibraryA 函数
     pfnLoadLibraryA LoadLibraryA = (pfnLoadLibraryA)GetProcAddrByHash(Kernel32, HASH_LoadLibraryA);
 
     // 载入 User32.dll 模块
